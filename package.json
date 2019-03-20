@@ -1,0 +1,35 @@
+{
+  "name": "@uts-eresearch/sails-hook-redbox-redcap",
+  "version": "1.0.0",
+  "description": "Redbox hook for REDCap API",
+  "main": "index.js",
+  "sails": {
+    "isHook": true,
+    "hookName": "redcap"
+  },
+  "scripts": {
+    "test": "NODE_ENV=test node_modules/.bin/mocha",
+    "runDev": "docker-compose -f support/development/docker-compose.yml up"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@code.research.uts.edu.au:eresearch/sails-hook-redbox-redcap.git"
+  },
+  "keywords": [
+    "sails",
+    "hook",
+    "redbox",
+    "provisioner"
+  ],
+  "author": "Weisi Chen",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "mocha": "^5.1.1",
+    "sails": "^1.1.0",
+    "supertest": "^3.0.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "redcap": "^0.3.0"
+  }
+}
