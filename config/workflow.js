@@ -10,7 +10,7 @@ module.exports.workflow = {
           viewRoles: ['Admin', 'Librarians'],
           editRoles: ['Admin', 'Librarians']
         },
-        form: 'example-1.0-draft'
+        form: 'redcap-1.0-draft'
       },
       starting: true
     }

@@ -23,7 +23,7 @@ module.exports = {
     },
     provisionerUser: 'admin',
     parentRecord: 'rdmp',
-    labarchives: {
+    redcap: {
       parentRecord: 'rdmp',
       formName: 'redcap-1.0-draft',
       workflowStage: 'draft',

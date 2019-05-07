@@ -1,4 +1,4 @@
-## A Sails Hook Redbox REDCap
+## A Sails Hook Redbox - REDCap
 
 In this example template you will find the barebones requirements for a Hook
 

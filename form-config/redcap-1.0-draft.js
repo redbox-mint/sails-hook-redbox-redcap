@@ -24,68 +24,42 @@ module.exports = {
       viewOnly: false,
       definition: {
         name: 'title',
-        value: 'redcap',
+        value: 'RedCap',
         type: 'h2'
       }
     },
     {
-      class: 'RedcapLoginField',
+      class: 'Container',
+      compClass: 'TextBlockComponent',
       viewOnly: false,
       definition: {
-        name: 'Login',
-        loginLabel: 'Login',
-        userLoginError:'Please include your UTS email address',
-        usernameLabel: 'UTS email address',
-        userPasswordError: 'Please include your REDCap Project API token',
-        passwordLabel: 'REDCap Project API token for external applications',
-        helpLoginLabel: 'To get your REDCap Project API token:',
-        helpLoginLabelList: [
+        name: 'subtitle',
+        value: 'Workspaces',
+        type: 'h3'
+      }
+    },
+    {
+      class: 'RedcapTokenField',
+      viewOnly: false,
+      definition: {
+        name: 'Token',
+        tokenLabel: 'Project Token',
+        tokenAddLabel: 'Add',
+        tokenError:'Please include your REDCap Project API token',
+        helpTokenLabel: 'To get your REDCap Project API token:',
+        helpTokenLabelList: [
           'Log in to REDCap',
           'Create a project',
           'Select API, and create an API token for this project',
-          'Copy the API oken',
+          'Copy the API token',
           'Come back to this screen',
           'Enter your UTS email address',
           'Paste the API token you copied above into REDCap API token for external applications.'
         ],
-        loginHelpImageAlt: 'REDCap help login',
-        loginHelpImage: '/angular/redcap/assets/images/redcap-help-login.png',
-        closeLabel: 'Close'
+        helpTokenImageAlt: 'REDCap token help',
+        helpTokenImage: '/angular/redcap/assets/images/redcap-help.png',
+        linkLabel: 'Link to Plan'
       }
-    },
-    {
-      class: 'RedcapListField',
-      viewOnly: false,
-      definition: {
-        name: 'List',
-        linkedLabel: 'Linked with Stash',
-        defaultNotebookLabel: 'Default Project'
-      }
-    },
-    {
-      class: 'RedcapLinkField',
-      viewOnly: false,
-      definition: {
-        name: 'Link',
-        processingLabel: 'Processing...',
-        processingSuccess: 'Your workspace was linked successfully',
-        processingFail: 'There was a problem linking your workspace, please try again later',
-        processingNoPermission: 'You do not have rights to modify this item',
-        closeLabel: 'Close',
-      }
-    },
-    {
-      class: "AnchorOrButton",
-      viewOnly: false,
-      definition: {
-        name: "BackToPlan",
-        label: 'Back to your Plan',
-        value: '/@branding/@portal/record/edit/',
-        cssClasses: 'btn btn-large btn-info',
-        showPencil: false,
-        controlType: 'anchor'
-      },
-      variableSubstitutionFields: ['value']
     }
   ]
 };

@@ -1,5 +1,5 @@
 {
-  "name": "@uts-eresearch/sails-hook-redbox-redcap",
+  "name": "sails-hook-redbox-redcap",
   "version": "1.0.0",
   "description": "Redbox hook for REDCap API",
   "main": "index.js",
@@ -30,6 +30,10 @@
   },
   "dependencies": {
     "lodash": "^4.17.11",
-    "redcap": "^0.3.0"
+    "path-exists": "^3.0.0",
+    "rxjs": "6.4.0",
+    "rxjs-compat": "6.4.0",
+    "request": "^2.85.0",
+    "request-promise": "^4.2.0"
   }
 }

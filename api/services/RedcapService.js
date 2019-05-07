@@ -1,23 +1,36 @@
-const config = {
-  host: 'redcap.research.uts.edu.au',
-  path: '/api/'
-};
-
-const redcap = require ('redcap') ('EDE0B1F3AA10D82FDE5BC17A21B345B3', config);
-
-module.exports = {
-
-  exportProject: function () {
-    const projects = redcap.projects.export(function(err, res) {
-          // error containts oprtional errors
-          if (err) {
-              // handle error
-          }
-          else {
-              // res is return value
-              console.log (res);
-          }
-        });
-    return projects;
-  }
-};
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const requestPromise = require("request-promise");
+const services = require("../core/CoreService");
+var Services;
+(function (Services) {
+    class RedcapService extends services.Services.Core.Service {
+        constructor() {
+            super();
+            this._exportedMethods = [
+                'project'
+            ];
+            this.config = null;
+        }
+        project(config, token) {
+            const opts = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'Accept': 'application/json'
+                },
+                uri: config.http + config.host + config.path,
+                method: 'POST',
+                formData: {
+                    token: token,
+                    content: 'project',
+                    format: 'json',
+                    returnFormat: 'json'
+                },
+                json: true
+            };
+            return requestPromise(opts);
+        }
+    }
+    Services.RedcapService = RedcapService;
+})(Services = exports.Services || (exports.Services = {}));
+module.exports = new Services.RedcapService().exports();

@@ -16,7 +16,7 @@ module.exports = function (sails) {
       // This can be for example: copy files or images to the redbox-portal front end
       // To test run with: NODE_ENV=test mocha
       // The Hook is environment specific, that is, the environments are also available whenever the sails app is hooked
-      /* let angularDest;
+      let angularDest;
       let angularOrigin;
       ncp.limit = 16;
       let angularTmpDest = '.tmp/public/angular/redcap';
@@ -49,14 +49,14 @@ module.exports = function (sails) {
           }
           return cb();
         });
-      });*/
-      return cb();
+      });
     },
     //If each route middleware do not exist sails.lift will fail during hook.load()
     routes: {
       before: {},
       after: {
-        'get /:branding/:portal/ws/redcap/info': RedcapController.exportProject
+        'post /:branding/:portal/ws/redcap/project': RedcapController.project,
+        'post /:branding/:portal/ws/redcap/link': RedcapController.link
       }
     },
     configure: function () {
