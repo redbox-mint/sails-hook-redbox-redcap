@@ -12,10 +12,11 @@ export class RedcapTokenField extends FieldBase<any> {
   loading: boolean;
   valid = true;
   token: string;
+  invalidToken: string;
   columns: object[];
   tokenLabel: string;
   tokenAddLabel: string;
-  tokenError: string;
+  tokenError: boolean;
   helpTokenLabel: string;
   helpTokenLabelList: object[];
   helpTokenImage: string;
@@ -38,7 +39,7 @@ export class RedcapTokenField extends FieldBase<any> {
   processingLabel: string;
   processingMessage: string;
   processingSuccess: string;
-  processingFail: string;
+  newlink: boolean;
   processingStatus: string;
   processingNoPermission: string;
   rdmp: string;
@@ -48,8 +49,8 @@ export class RedcapTokenField extends FieldBase<any> {
     this.loading = true;
     this.columns = options['columns'] || [];
     this.tokenLabel = options['tokenLabel'] || 'Add token';
-    this.tokenAddLabel = options['tokenAddLabel'] || 'Add token'
-    this.tokenError = options['tokenError'] || 'Please include token';
+    this.tokenAddLabel = options['tokenAddLabel'] || 'Add token';
+    this.tokenError = true;
     this.helpTokenLabel = options['helpTokenLabel'] || '';
     this.helpTokenLabelList = options['helpTokenLabelList'] || [];
     this.helpTokenImageAlt = options['helpTokenImageAlt'] || 'REDCap help token';
@@ -67,37 +68,39 @@ export class RedcapTokenField extends FieldBase<any> {
   async addToken(value){
     this.token = value;
     console.log(this.token);
-    //TODO: wrap try/catch
-    const res = await this.redcapService.project(this.token);
-    if(res.status){
-      this.project = res.project;
-      this.tokenLoaded = true;
-    } else {
-        this.errorMessage = res.message;
-        this.tokenLoaded = false;
+    try{
+      const res = await this.redcapService.project(this.token);
+      if(res.status){
+        this.project = res.project;
+        this.tokenLoaded = true;
+        this.tokenError = false;
+      } else {
+          this.errorMessage = res.message;
+          this.tokenLoaded = false;
+          this.tokenError = true;
+          this.invalidToken = 'Invalid REDCap project token. Please check on REDCap.';
+      }
+    } catch (e) {
+      this.tokenError = true;
     }
   }
 
   async linkProject(project: any) {
     try {
-      //jQuery('#linkModal').modal('show');
       this.processing = true;
-      this.processingStatus = 'linking';
+      this.newlink = false;
+      this.processingStatus = 'Linking';
       const link = await this.redcapService.link(project, this.rdmp);
-      this.processingStatus = 'done';
-      //this.checks.link = true;
       this.processing = false;
-      if (link.status) {
-        //this.checks.linkCreated = true;
-        //this.checks.master = true;
-        this.processingFail = undefined;
-      } else if(link.message === 'cannot insert node'){
-        this.processingFail = this.processingNoPermission;
-        //this.checks.linkWithOther = true
+      if (!link.linked) {
+        this.newlink = true;
+        this.processingStatus = 'Success!';
+      } else if(link.message === 'Project has already been linked'){
+        this.newlink = false;
+        this.processingStatus = 'Already Linked with a different RDMP';
       }
     } catch (e) {
       this.processing = false;
-      //this.checks.linkWithOther = true;
     }
   }
 
@@ -107,37 +110,48 @@ export class RedcapTokenField extends FieldBase<any> {
 @Component({
   selector: 'ws-redcaptoken',
   template: `
-  <div *ngIf="!field.tokenLoaded">
-    <form #form="ngForm">
-      <div class="form-group">
-        <label>{{ field.tokenLabel }}</label>
-        <input type="text" class="form-control" name="token" ngModel
-               attr.aria-label="{{ field.tokenLabel }}">
+    <div *ngIf="!field.tokenLoaded">
+      <form #form="ngForm">
+        <div class="form-group">
+          <label>{{ field.tokenLabel }}</label>
+          <input type="text" class="form-control" name="token" ngModel
+                 attr.aria-label="{{ field.tokenLabel }}">
+        </div>
+        <div class="form-row">
+          <p>
+            <button (click)="field.addToken(form.value)" type="submit" [disabled]="!field.valid" class="btn btn-primary">
+              {{ field.tokenAddLabel }}
+            </button>
+          </p>
+        </div>
+        <div *ngIf="field.tokenError">
+          <table style="width:100%">
+            <tr>
+              <td><b><font color = "red">{{ field.invalidToken }}</font></b></td>
+            </tr>
+          </table>
+        </div>
+      </form>
+      <div class="row">
+        <p>&nbsp;</p>
       </div>
       <div class="form-row">
-        <p>
-          <button (click)="field.addToken(form.value)" type="submit" [disabled]="!field.valid" class="btn btn-primary">
-            {{ field.tokenAddLabel }}
-          </button>
-        </p>
+        <p>{{ field.helpTokenLabel }}</p>
+        <ul>
+          <li *ngFor="let help of field.helpTokenLabelList">{{ help }}</li>
+        </ul>
+        <div class="form-row col-md-6">
+          <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage"
+               style="padding: 4px; border: dotted 1px #ccc;"/>
+        </div>
       </div>
-    </form>
-    <div class="row">
-      <p>&nbsp;</p>
-    </div>
-    <div class="form-row">
-      <p>{{ field.helpTokenLabel }}</p>
-      <ul>
-        <li *ngFor="let help of field.helpTokenLabelList">{{ help }}</li>
-      </ul>
-      <div class="form-row col-md-6">
-        <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage"
-             style="padding: 4px; border: dotted 1px #ccc;"/>
-      </div>
-    </div>
     </div>
     <div *ngIf="field.tokenLoaded">
       <table style="width:100%">
+        <tr>
+          <td>REDCap Project ID</td>
+          <td>{{ field.project.project_id }}</td>
+        </tr>
         <tr>
           <td>Project Title</td>
           <td>{{ field.project.project_title }}</td>
@@ -165,6 +179,20 @@ export class RedcapTokenField extends FieldBase<any> {
             {{ field.linkLabel }}
           </button>
         </p>
+      </div>
+      <div *ngIf="field.newlink">
+        <table style="width:100%">
+          <tr>
+            <td>{{ field.processingStatus }}</td>
+          </tr>
+        </table>
+      </div>
+      <div *ngIf="!field.newlink">
+        <table style="width:100%">
+          <tr>
+            <td><b><font color = "red">{{ field.processingStatus }}</font></b></td>
+          </tr>
+        </table>
       </div>
     </div>
   `
