@@ -19,6 +19,19 @@ If you require to have a form in your portal
 - `config/recordtype`
 - `config/workflow`
 - `form-config/template-1.0-draft`
+- `config/env/development.js
+```
+redcap: {
+      parentRecord: 'rdmp',
+      formName: 'redcap-1.0-draft',
+      workflowStage: 'draft',
+      appName: 'redcap',
+      appId: 'redcap',
+      recordType: 'redcap',
+      location: 'redcap.research.uts.edu.au',
+      description: 'REDCap Workspace'
+    }
+```
 
 ## index
 
