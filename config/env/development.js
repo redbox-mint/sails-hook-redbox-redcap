@@ -30,8 +30,6 @@ module.exports = {
       appName: 'redcap',
       appId: 'redcap',
       recordType: 'redcap',
-      workspaceFileName: 'README.md',
-      key: {"akid": "USER", "password": "PASSWORD"},
       location: 'redcap.research.uts.edu.au',
       description: 'REDCap Workspace'
     }
