@@ -1,12 +1,6 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-# angular/redcap/redbox-portal/
-# compiled output
-/dist
-/dist-server
-/tmp
-/out-tsc
-
+angular/redcap/redbox-portal
 # dependencies
 node_modules
 
@@ -44,5 +38,4 @@ e2e/*.map
 .DS_Store
 Thumbs.db
 
-test/angular
 sailsWorkingDir

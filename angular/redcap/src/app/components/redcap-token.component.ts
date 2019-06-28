@@ -47,6 +47,7 @@ export class RedcapTokenField extends FieldBase<any> {
   constructor(options: any, injector: any) {
     super(options, injector);
     this.loading = true;
+    this.location = options['location'];
     this.columns = options['columns'] || [];
     this.tokenLabel = options['tokenLabel'] || 'Add token';
     this.tokenAddLabel = options['tokenAddLabel'] || 'Add token';
@@ -137,6 +138,9 @@ export class RedcapTokenField extends FieldBase<any> {
       </div>
       <div class="form-row">
         <p>{{ field.helpTokenLabel }}</p>
+        <p>
+          <a href="{{ field.location }}" target="_blank" rel="noopener noreferrer">{{ field.location }}</a>
+        </p>
         <ul>
           <li *ngFor="let help of field.helpTokenLabelList">{{ help }}</li>
         </ul>
