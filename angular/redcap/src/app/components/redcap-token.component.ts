@@ -59,7 +59,7 @@ export class RedcapTokenField extends FieldBase<any> {
     this.closeLabel = options['closeLabel'] || 'Close';
     this.redcapService = this.getFromInjector(RedcapService);
     this.linkLabel = options['linkLabel'] || 'Link to Plan';
-    console.log(this.columns);
+    //console.log(this.columns);
   }
 
   init() {
@@ -68,7 +68,7 @@ export class RedcapTokenField extends FieldBase<any> {
 
   async addToken(value){
     this.token = value;
-    console.log(this.token);
+    //console.log(this.token);
     try{
       const res = await this.redcapService.project(this.token);
       if(res.status){

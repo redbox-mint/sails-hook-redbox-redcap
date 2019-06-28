@@ -153,8 +153,9 @@ export class RedcapFormComponent extends LoadableComponent {
         }
       });
     }).catch((err: any) => {
-      console.log("Error loading form...");
-      console.log(err);
+      //console.log("Error loading form...");
+      console.error(err)
+      //console.log(err);
       if (err.status == false) {
         this.criticalError = err.message;
       }
