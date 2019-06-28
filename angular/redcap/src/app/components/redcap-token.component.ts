@@ -141,12 +141,36 @@ export class RedcapTokenField extends FieldBase<any> {
         <p>
           <a href="{{ field.location }}" target="_blank" rel="noopener noreferrer">{{ field.location }}</a>
         </p>
-        <ul>
-          <li *ngFor="let help of field.helpTokenLabelList">{{ help }}</li>
-        </ul>
-        <div class="form-row col-md-6">
-          <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage"
+        <div class="row">
+          <div class="col-sm-4">
+            <p>Step 1: Log in to REDCap.</p>
+            <p>Step 2: Create a new project if you do not have one yet.</p>
+            <p>Step 3: Make sure you have the permissions to use a REDCap API for this project. Set this up in "User Rights" if you do not have API permissions.</p>
+          </div>
+          <div class="col-sm-8">
+            <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage1"
                style="padding: 4px; border: dotted 1px #ccc;"/>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4">
+            <p>Step 4: From the "Applications" Menu on the left-hand side, click on "API".</p>
+          </div>
+          <div class="col-sm-8">
+            <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage2"
+               style="padding: 4px; border: dotted 1px #ccc;"/>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4">
+            <p>Step 5: Request for an API token for this project.</p>
+            <p>Step 6: Come back to this screen.</p>
+            <p>Step 7: Paste the API token you copied into the "REDCap API token" field.</p>
+          </div>
+          <div class="col-sm-8">
+            <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage3"
+               style="padding: 4px; border: dotted 1px #ccc;"/>
+          </div>
         </div>
       </div>
     </div>

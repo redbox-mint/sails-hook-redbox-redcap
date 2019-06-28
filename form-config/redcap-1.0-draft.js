@@ -47,6 +47,7 @@ module.exports = {
         tokenAddLabel: 'Add',
         tokenError:'Please include your REDCap Project API token',
         helpTokenLabel: 'To get your REDCap Project API token:',
+        location: 'redcap.research.uts.edu.au',
         helpTokenLabelList: [
           'Log in to REDCap',
           'Create a project',
@@ -57,7 +58,9 @@ module.exports = {
           'Paste the API token you copied above into REDCap API token for external applications.'
         ],
         helpTokenImageAlt: 'REDCap token help',
-        helpTokenImage: '/angular/redcap/assets/images/redcap-help.png',
+        helpTokenImage1: '/angular/redcap/assets/images/redcap-help123.png',
+        helpTokenImage2: '/angular/redcap/assets/images/redcap-help4.png',
+        helpTokenImage3: '/angular/redcap/assets/images/redcap-help567.png',
         linkLabel: 'Link to Plan'
       }
     }
