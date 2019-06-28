@@ -165,7 +165,7 @@ export class RedcapTokenField extends FieldBase<any> {
           <div class="col-sm-4">
             <p>Step 5: Request for an API token for this project.</p>
             <p>Step 6: Come back to this screen.</p>
-            <p>Step 7: Paste the API token you copied into the "REDCap API token" field.</p>
+            <p>Step 7: Paste the API token you copied into the "REDCap Project API Token" field.</p>
           </div>
           <div class="col-sm-8">
             <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage3"

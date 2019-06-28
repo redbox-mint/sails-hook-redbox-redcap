@@ -43,7 +43,7 @@ module.exports = {
       viewOnly: false,
       definition: {
         name: 'Token',
-        tokenLabel: 'Project Token',
+        tokenLabel: 'REDCap Project API Token',
         tokenAddLabel: 'Add',
         tokenError:'Please include your REDCap Project API token',
         helpTokenLabel: 'To get your REDCap Project API token:',
