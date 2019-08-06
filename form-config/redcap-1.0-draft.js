@@ -47,7 +47,7 @@ module.exports = {
         tokenAddLabel: 'Add',
         tokenError:'Please include your REDCap Project API token',
         helpTokenLabel: 'To get your REDCap Project API token:',
-        location: 'redcap.research.uts.edu.au',
+        location: 'https://redcap.research.uts.edu.au',
         helpTokenLabelList: [
           'Log in to REDCap',
           'Create a project',

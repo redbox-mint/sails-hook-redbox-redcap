@@ -30,7 +30,7 @@ module.exports = {
       appName: 'redcap',
       appId: 'redcap',
       recordType: 'redcap',
-      location: 'redcap.research.uts.edu.au',
+      location: 'https://redcap.research.uts.edu.au',
       description: 'REDCap Workspace'
     }
   }
