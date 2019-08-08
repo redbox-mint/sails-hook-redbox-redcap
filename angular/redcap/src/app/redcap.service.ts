@@ -51,7 +51,6 @@ export class RedcapService extends BaseService {
   public async link(workspace: any, rdmpId: string) {
     const wsUrl = this.brandingAndPortalUrl + '/ws/redcap/link';
     try {
-      //console.log(rdmpId);
       const result = await this.http.post(
         wsUrl,
         {rdmp: rdmpId, workspace: workspace},

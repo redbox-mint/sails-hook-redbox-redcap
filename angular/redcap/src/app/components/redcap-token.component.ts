@@ -19,7 +19,9 @@ export class RedcapTokenField extends FieldBase<any> {
   tokenError: boolean;
   helpTokenLabel: string;
   helpTokenLabelList: object[];
-  helpTokenImage: string;
+  helpTokenImage1: string;
+  helpTokenImage2: string;
+  helpTokenImage3: string;
   helpTokenImageAlt: string;
   submitted = false;
   errorMessage: string = undefined;
@@ -55,7 +57,9 @@ export class RedcapTokenField extends FieldBase<any> {
     this.helpTokenLabel = options['helpTokenLabel'] || '';
     this.helpTokenLabelList = options['helpTokenLabelList'] || [];
     this.helpTokenImageAlt = options['helpTokenImageAlt'] || 'REDCap help token';
-    this.helpTokenImage = options['helpTokenImage'] || this.helpTokenImageAlt;
+    this.helpTokenImage1 = options['helpTokenImage1'] || this.helpTokenImageAlt;
+    this.helpTokenImage2 = options['helpTokenImage2'] || this.helpTokenImageAlt;
+    this.helpTokenImage3 = options['helpTokenImage3'] || this.helpTokenImageAlt;
     this.closeLabel = options['closeLabel'] || 'Close';
     this.redcapService = this.getFromInjector(RedcapService);
     this.linkLabel = options['linkLabel'] || 'Link to Plan';
@@ -93,12 +97,15 @@ export class RedcapTokenField extends FieldBase<any> {
       this.processingStatus = 'Linking';
       const link = await this.redcapService.link(project, this.rdmp);
       this.processing = false;
-      if (!link.linked) {
+      if (!link.linked && link.message === 'workspaceRecordCreated') {
         this.newlink = true;
         this.processingStatus = 'Success!';
       } else if(link.message === 'Project has already been linked'){
         this.newlink = false;
         this.processingStatus = 'Already Linked with a different RDMP';
+      } else
+      {
+        this.processingStatus = 'Error: Unable to link';
       }
     } catch (e) {
       this.processing = false;
@@ -137,24 +144,21 @@ export class RedcapTokenField extends FieldBase<any> {
         <p>&nbsp;</p>
       </div>
       <div class="form-row">
-        <p>{{ field.helpTokenLabel }}</p>
-        <p>
-          <a href="{{ field.location }}" target="_blank" rel="noopener noreferrer">{{ field.location }}</a>
-        </p>
+        <p><b><font color="red">{{ field.helpTokenLabel }}</font></b></p>
         <div class="row">
           <div class="col-sm-4">
-            <p>Step 1: Log in to REDCap.</p>
-            <p>Step 2: Create a new project if you do not have one yet.</p>
-            <p>Step 3: Make sure you have the permissions to use a REDCap API for this project. Set this up in "User Rights" if you do not have API permissions.</p>
+            <p><b>Step 1: Log in to REDCap: https://redcap.research.uts.edu.au</b></p>
+            <p><b>Step 2: Create a new project if you do not have one yet.</b></p>
+            <p><b>Step 3: Make sure you have the permissions to use a REDCap API for this project. Set this up in "User Rights" if you do not have API permissions.</b></p>
           </div>
           <div class="col-sm-8">
-            <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage1"
+            <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage1" width="50%" height="50%"
                style="padding: 4px; border: dotted 1px #ccc;"/>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-4">
-            <p>Step 4: From the "Applications" Menu on the left-hand side, click on "API".</p>
+            <p><b>Step 4: From the "Applications" Menu on the left-hand side, click on "API".</b></p>
           </div>
           <div class="col-sm-8">
             <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage2"
@@ -163,9 +167,9 @@ export class RedcapTokenField extends FieldBase<any> {
         </div>
         <div class="row">
           <div class="col-sm-4">
-            <p>Step 5: Request for an API token for this project.</p>
-            <p>Step 6: Come back to this screen.</p>
-            <p>Step 7: Paste the API token you copied into the "REDCap Project API Token" field.</p>
+            <p><b>Step 5: Request for an API token for this project.</b></p>
+            <p><b>Step 6: Come back to this screen.</b></p>
+            <p><b>Step 7: Paste the API token you copied into the "REDCap Project API Token" field.</b></p>
           </div>
           <div class="col-sm-8">
             <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage3"

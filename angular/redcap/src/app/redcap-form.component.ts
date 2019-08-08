@@ -149,7 +149,7 @@ export class RedcapFormComponent extends LoadableComponent {
           this.watchForChanges();
           this.registerEvents();
           const focusTab = '?focusTabId=workspaces';
-          //this.fieldMap['BackToPlan'].field.value = this.fieldMap['BackToPlan'].field.value + this.rdmp + focusTab;
+          this.fieldMap['BackToPlan'].field.value = this.fieldMap['BackToPlan'].field.value + this.rdmp + focusTab;
         }
       });
     }).catch((err: any) => {

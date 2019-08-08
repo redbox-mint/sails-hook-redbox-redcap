@@ -63,6 +63,19 @@ module.exports = {
         helpTokenImage3: '/angular/redcap/assets/images/redcap-help567.png',
         linkLabel: 'Link to Plan'
       }
+    },
+    {
+      class: "AnchorOrButton",
+      viewOnly: false,
+      definition: {
+        name: "BackToPlan",
+        label: 'Back to your Plan',
+        value: '/@branding/@portal/record/edit/',
+        cssClasses: 'btn btn-large btn-info',
+        showPencil: false,
+        controlType: 'anchor'
+      },
+      variableSubstitutionFields: ['value']
     }
   ]
 };
