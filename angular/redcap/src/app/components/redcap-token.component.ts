@@ -102,7 +102,7 @@ export class RedcapTokenField extends FieldBase<any> {
         this.processingStatus = 'Success!';
       } else if(link.message === 'Project has already been linked'){
         this.newlink = false;
-        this.processingStatus = 'Already Linked with a different RDMP';
+        this.processingStatus = 'Already Linked with an RDMP';
       } else
       {
         this.processingStatus = 'Error: Unable to link';
