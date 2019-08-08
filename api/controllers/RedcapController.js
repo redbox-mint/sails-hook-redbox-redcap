@@ -78,15 +78,12 @@ var Controllers;
                     .flatMap(response => {
                     recordMetadata = response;
                     rdmpTitle = recordMetadata.title;
-                    sails.log.debug(userId);
-                    sails.log.debug('RDMP id: ' + rdmp);
-                    sails.log.debug('RDMP title: ' + rdmpTitle);
                     const record = {
                         rdmpOid: rdmp,
                         rdmpTitle: rdmpTitle,
                         id: projectID,
                         title: projectName,
-                        location: this.config.location,
+                        location: this.config.location + "redcap_v8.11.3/index.php?pid=" + projectID,
                         description: this.config.description,
                         type: this.config.recordType
                     };

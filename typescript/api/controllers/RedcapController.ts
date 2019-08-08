@@ -68,6 +68,7 @@ export module Controllers {
       const projectID = project.project_id;
       const projectName = project.project_title;
       const projectNotes = project.project_notes;
+      //const project_link = this.config.location;
       let newNotes = '';
       let workspace: any = null;
       let rdmpTitle = '';
@@ -91,16 +92,17 @@ export module Controllers {
           .flatMap(response => {
             recordMetadata = response;
             rdmpTitle = recordMetadata.title;
-            sails.log.debug(userId);
-            sails.log.debug('RDMP id: ' + rdmp);
-            sails.log.debug('RDMP title: ' + rdmpTitle);
+            //sails.log.debug(userId);
+            //sails.log.debug('RDMP id: ' + rdmp);
+            //sails.log.debug('RDMP title: ' + rdmpTitle);
             //sails.log.debug(response);
+
             const record = {
               rdmpOid: rdmp,
               rdmpTitle: rdmpTitle,
               id: projectID,
               title: projectName,
-              location: this.config.location,
+              location: this.config.location + "redcap_v8.11.3/index.php?pid=" + projectID,
               description: this.config.description, //'RedCap Workspace',
               type: this.config.recordType
             };
