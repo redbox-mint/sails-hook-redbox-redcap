@@ -102,7 +102,7 @@ export module Controllers {
               rdmpTitle: rdmpTitle,
               id: projectID,
               title: projectName,
-              location: this.config.location + "redcap_v8.11.3/index.php?pid=" + projectID,
+              location: this.config.location + "/redcap_v8.11.3/index.php?pid=" + projectID,
               description: this.config.description, //'RedCap Workspace',
               type: this.config.recordType
             };
