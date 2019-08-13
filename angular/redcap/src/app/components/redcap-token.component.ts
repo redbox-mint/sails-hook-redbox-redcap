@@ -147,29 +147,30 @@ export class RedcapTokenField extends FieldBase<any> {
         <p><b><font color="red">{{ field.helpTokenLabel }}</font></b></p>
         <div class="row">
           <div class="col-sm-4">
-            <p><b>Step 1: Log in to REDCap: https://redcap.research.uts.edu.au</b></p>
+            <p><b>Step 1: Log in to REDCap: <a href="https://redcap.research.uts.edu.au">https://redcap.research.uts.edu.au</a></b></p>
             <p><b>Step 2: Create a new project if you do not have one yet.</b></p>
-            <p><b>Step 3: Make sure you have the permissions to use a REDCap API for this project. Set this up in "User Rights" if you do not have API permissions.</b></p>
           </div>
           <div class="col-sm-8">
-            <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage1" width="50%" height="50%"
+            <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage1"
                style="padding: 4px; border: dotted 1px #ccc;"/>
+            <p></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4">
+            <p><b>Step 3: Make sure you have the permissions to use a REDCap API for this project. If you do not have API permissions yet, please set this up by clicking on your email address in "User Rights", ticking the "Import" and "Export" API permissions and then refreshing the page.</b></p>
+          </div>
+          <div class="col-sm-8">
+            <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage2"
+               style="padding: 4px; border: dotted 1px #ccc;"/>
+            <p></p>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-4">
             <p><b>Step 4: From the "Applications" Menu on the left-hand side, click on "API".</b></p>
-          </div>
-          <div class="col-sm-8">
-            <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage2"
-               style="padding: 4px; border: dotted 1px #ccc;"/>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-4">
-            <p><b>Step 5: Request for an API token for this project.</b></p>
-            <p><b>Step 6: Come back to this screen.</b></p>
-            <p><b>Step 7: Paste the API token you copied into the "REDCap Project API Token" field.</b></p>
+            <p><b>Step 5: Click on "Generate API token" button for this project.</b></p>
+            <p><b>Step 6: Copy the API token, come back to this page on Stash, and paste the API token into the "REDCap Project API Token" field above.</b></p>
           </div>
           <div class="col-sm-8">
             <img alt="{{ field.helpTokenImageAlt }}" [src]="field.helpTokenImage3"

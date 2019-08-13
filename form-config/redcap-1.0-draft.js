@@ -58,9 +58,9 @@ module.exports = {
           'Paste the API token you copied above into REDCap API token for external applications.'
         ],
         helpTokenImageAlt: 'REDCap token help',
-        helpTokenImage1: '/angular/redcap/assets/images/redcap-help123.png',
-        helpTokenImage2: '/angular/redcap/assets/images/redcap-help4.png',
-        helpTokenImage3: '/angular/redcap/assets/images/redcap-help567.png',
+        helpTokenImage1: '/angular/redcap/assets/images/redcap-help12.png',
+        helpTokenImage2: '/angular/redcap/assets/images/redcap-help3.png',
+        helpTokenImage3: '/angular/redcap/assets/images/redcap-help456.png',
         linkLabel: 'Link to Plan'
       }
     },
