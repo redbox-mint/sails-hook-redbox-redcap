@@ -24,7 +24,7 @@ module.exports = {
       viewOnly: false,
       definition: {
         name: 'title',
-        value: 'RedCap',
+        value: 'REDCap',
         type: 'h2'
       }
     },
