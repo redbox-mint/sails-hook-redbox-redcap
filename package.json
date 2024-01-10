@@ -1,6 +1,6 @@
 {
   "name": "sails-hook-redbox-redcap",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Redbox hook for REDCap API",
   "main": "index.js",
   "sails": {
@@ -24,16 +24,19 @@
   "author": "Weisi Chen",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@types/node": "^20.10.8",
     "mocha": "^5.1.1",
     "sails": "^1.1.0",
     "supertest": "^3.0.0"
   },
   "dependencies": {
+    "@researchdatabox/redbox-core-types": "^1.4.2",
     "lodash": "^4.17.11",
     "path-exists": "^3.0.0",
+    "request": "^2.85.0",
+    "request-promise": "^4.2.0",
     "rxjs": "6.4.0",
     "rxjs-compat": "6.4.0",
-    "request": "^2.85.0",
-    "request-promise": "^4.2.0"
+    "typescript": "^5.3.3"
   }
 }

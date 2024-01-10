@@ -4,12 +4,13 @@ declare var _;
 
 import {Observable} from 'rxjs';
 import 'rxjs/add/operator/map';
+import { Controllers as controllers} from '@researchdatabox/redbox-core-types';
 
 declare var BrandingService, WorkspaceService, RedcapService;
 /**
  * Package that contains all Controllers.
  */
-import controller = require('../core/CoreController');
+
 import {Config} from '../Config';
 
 export module Controllers {
@@ -17,14 +18,14 @@ export module Controllers {
    * Redcap related features....
    *
    */
-  export class RedcapController extends controller.Controllers.Core.Controller {
+  export class RedcapController extends controllers.Core.Controller {
 
     protected _exportedMethods: any = [
       'project',
       'link'
     ];
 
-    _config: any;
+
     protected config: Config;
     token: string;
     //config: any;

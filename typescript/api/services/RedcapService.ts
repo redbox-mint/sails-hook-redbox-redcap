@@ -3,15 +3,14 @@ import * as requestPromise from "request-promise";
 import { from } from 'rxjs';
 
 import { Config } from '../Config';
-
-import services = require('../core/CoreService');
+import { Services as services } from '@researchdatabox/redbox-core-types';
 
 declare var sails: Sails;
 declare var WorkspaceService, _;
 
 export module Services {
 
-  export class RedcapService extends services.Services.Core.Service {
+  export class RedcapService extends services.Core.Service {
 
     protected config: Config;
     protected _exportedMethods: any = [
