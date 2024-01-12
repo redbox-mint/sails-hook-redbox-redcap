@@ -1,13 +1,13 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
-    "name": "redcap"
+    "name": "angular"
   },
   "apps": [
     {
       "name": "redcap",
       "root": "src",
-      "outDir": "dist",
+      "outDir": "dist/",
       "assets": [
         "assets",
         "favicon.ico"
@@ -20,10 +20,9 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "styles.css"
+        "styles.scss"
       ],
       "scripts": [
-        "../node_modules/jquery/dist/jquery.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
@@ -31,6 +30,7 @@
         "prod": "environments/environment.prod.ts"
       }
     }
+
   ],
   "e2e": {
     "protractor": {

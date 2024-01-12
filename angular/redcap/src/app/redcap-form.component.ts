@@ -1,12 +1,12 @@
 import {Component, Inject, Input, ElementRef, Output, EventEmitter} from '@angular/core';
 import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common';
 import {FormGroup, FormControl, Validators, NgForm} from '@angular/forms';
-import {RecordsService} from './shared/form/records.service';
-import {LoadableComponent} from './shared/loadable.component';
-import {FieldControlService} from './shared/form/field-control.service';
+import {RecordsService} from '../../shared/form/records.service';
+import {LoadableComponent} from '../..//shared/loadable.component';
+import {FieldControlService} from '../../shared/form/field-control.service';
 import {Observable} from 'rxjs/Observable';
-import * as _ from "lodash-es";
-import {TranslationService} from './shared/translation-service';
+import * as _ from "lodash";
+import {TranslationService} from '../../shared/translation-service';
 
 import {RedcapTokenComponent, RedcapTokenField} from './components/redcap-token.component';
 
