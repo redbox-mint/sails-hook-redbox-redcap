@@ -11,7 +11,7 @@ declare var jQuery: any;
 export class RedcapTokenField extends FieldBase<any> {
   loading: boolean;
   valid = true;
-  token: string;
+  token: any;
   invalidToken: string;
   columns: object[];
   tokenLabel: string;
@@ -95,7 +95,7 @@ export class RedcapTokenField extends FieldBase<any> {
       this.processing = true;
       this.newlink = false;
       this.processingStatus = 'Linking';
-      const link = await this.redcapService.link(project, this.rdmp);
+      const link = await this.redcapService.link(project, this.rdmp, this.token.token);
       this.processing = false;
       if (!link.linked && link.message === 'workspaceRecordCreated') {
         this.newlink = true;

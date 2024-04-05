@@ -48,12 +48,12 @@ export class RedcapService extends BaseService {
     }
   }
 
-  public async link(workspace: any, rdmpId: string) {
+  public async link(workspace: any, rdmpId: string, token: string) {
     const wsUrl = this.brandingAndPortalUrl + '/ws/redcap/link';
     try {
       const result = await this.http.post(
         wsUrl,
-        {rdmp: rdmpId, workspace: workspace},
+        {rdmp: rdmpId, workspace: workspace, token: token},
         this.options
       ).toPromise();
       return Promise.resolve(this.extractData(result));

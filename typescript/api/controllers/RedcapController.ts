@@ -27,7 +27,6 @@ export module Controllers {
 
 
     protected config: Config;
-    token: string;
     //config: any;
 
     constructor() {
@@ -42,15 +41,15 @@ export module Controllers {
     public async project(req, res) {
       try {
         var tokenReq = req.param('token');
-        this.token = tokenReq.token;
-        sails.log.debug(this.token);
+        const token = tokenReq.token;
+        sails.log.debug(token);
         //TODO: remove this hardcoded url
         const config = {
           http: 'https://',
           host: 'redcap.research.uts.edu.au',
           path: '/api/'
         };
-        const projectInfo = await RedcapService.project(config, tokenReq.token);
+        const projectInfo = await RedcapService.project(config, token);
         this.ajaxOk(req, res, null, { status: true, project: projectInfo });
       } catch (error) {
         this.ajaxFail(req, res, error.message, { status: false, message: error.message });
@@ -58,13 +57,14 @@ export module Controllers {
     }
 
     public async link(req, res) {
-      sails.log.debug('Token to be linked is: ' + this.token);
+      
       const userId = req.user.id;
       const username = req.user.username;
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
       const rdmp = req.param('rdmp');
       const project = req.param('workspace');
-
+      const token = req.param('token');
+      sails.log.debug('Token to be linked is: ' + token);
       if (!project || !rdmp) {
         const message = 'rdmp, project are missing';
         this.ajaxFail(req, res, message, { status: false, message: message });
@@ -94,7 +94,7 @@ export module Controllers {
         // newNotes = '{"project_notes":"' + projectNotes + ' Stash RDMP ID: ' + rdmp + '."}';
         newNotes = JSON.stringify(newNotesObject)
         sails.log.debug('New Project Notes: ' + newNotes);
-        let redCapResponse = await RedcapService.addlinkinfo(config, this.token, newNotes)
+        let redCapResponse = await RedcapService.addlinkinfo(config, token, newNotes)
         sails.log.debug(redCapResponse);
 
 
