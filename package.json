@@ -31,10 +31,10 @@
   },
   "dependencies": {
     "@researchdatabox/redbox-core-types": "^1.4.2",
+    "axios": "^1.6.8",
     "lodash": "^4.17.11",
     "path-exists": "^3.0.0",
     "request": "^2.85.0",
-    "request-promise": "^4.2.0",
     "rxjs": "6.4.0",
     "rxjs-compat": "6.4.0",
     "typescript": "^5.3.3"
