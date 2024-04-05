@@ -6,8 +6,8 @@
   "apps": [
     {
       "name": "redcap",
-      "root": "src",
-      "outDir": "dist/",
+      "root": "redcap",
+      "outDir": "../assets/angular/redcap",
       "assets": [
         "assets",
         "favicon.ico"

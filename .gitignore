@@ -1,6 +1,9 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-angular/redcap/redbox-portal
+angular-legacy/shared
+angular-legacy/dist
+assets/angular
+assets/default/default/images/leaflet
 # dependencies
 node_modules
 

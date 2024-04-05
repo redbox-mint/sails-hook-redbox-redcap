@@ -13,8 +13,7 @@ jobs:
                     export NVM_DIR="$HOME/.nvm"
                     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
       - run: export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && nvm install && npm install && node_modules/.bin/tsc
-      - run: git clone https://github.com/redbox-mint/redbox-portal.git /tmp/rbportal && cp -Rf /tmp/rbportal/angular-legacy/shared/* angular/redcap/shared/
-      - run: export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && cd angular/redcap && nvm install && npm install && node_modules/.bin/ng build --app=redcap
+      - run: chmod +x support/build/compileAngularLegacy.sh && support/build/compileAngularLegacy.sh redcap
       # run tests!
       # - run: npm test
       # # store test results
@@ -44,8 +43,7 @@ jobs:
                     export NVM_DIR="$HOME/.nvm"
                     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
       - run: export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && nvm install && npm install && node_modules/.bin/tsc
-      - run: git clone https://github.com/redbox-mint/redbox-portal.git /tmp/rbportal && cp -Rf /tmp/rbportal/angular-legacy/shared/* angular/redcap/shared/
-      - run: export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && cd angular/redcap && nvm install && npm install && node_modules/.bin/ng build --app=redcap
+      - run: chmod +x support/build/compileAngularLegacy.sh && support/build/compileAngularLegacy.sh redcap
       # run tests!
       # - run: npm test
       # # store test results
