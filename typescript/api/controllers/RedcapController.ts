@@ -97,6 +97,7 @@ export module Controllers {
           host: this.config.host,
           path: this.config.path
         }
+      }
       //sails.log.debug(projectNotes.indexOf('Stash RDMP ID'));
       if (projectNotes.indexOf('Stash RDMP ID') == -1) {
         sails.log.debug('project id: ' + projectID);
@@ -142,7 +143,8 @@ export module Controllers {
       } else {
         this.ajaxOk(req, res, null, { status: true, message: 'Project has already been linked', linked: true });
       }
-    }
+    
+  }
 
     async createRecordByType(brand: any, recordType: string, recordMetadata: any, user: any, targetStep: string = null) {
       let record: any = {
