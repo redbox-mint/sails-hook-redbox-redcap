@@ -1,6 +1,6 @@
 {
   "name": "@researchdatabox/sails-hook-redbox-redcap",
-  "version": "0.0.1-prerelease",
+  "version": "0.0.2-prerelease",
   "description": "Redbox hook for REDCap API",
   "main": "index.js",
   "sails": {
