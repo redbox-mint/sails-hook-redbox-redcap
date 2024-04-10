@@ -43,12 +43,20 @@ export module Controllers {
         var tokenReq = req.param('token');
         const token = tokenReq.token;
         sails.log.debug(token);
-        //TODO: remove this hardcoded url
-        const config = {
-          http: 'https://',
-          host: 'redcap.research.uts.edu.au',
-          path: '/api/'
+        sails.log.error('Config Object:' + JSON.stringify(this.config))
+        let config:any = {
+          url: this.config.location,
+          path: this.config.path
         };
+        if(this.config.http != null) {
+          config = {
+            http: this.config.http,
+            host: this.config.host,
+            path: this.config.path
+          }
+        }
+
+        sails.log.error('Config:' + JSON.stringify(config))
         const projectInfo = await RedcapService.project(config, token);
         this.ajaxOk(req, res, null, { status: true, project: projectInfo });
       } catch (error) {
@@ -79,11 +87,16 @@ export module Controllers {
       let workspace: any = null;
       let rdmpTitle = '';
       let recordMetadata = null;
-      const config = {
-        http: 'https://',
-        host: 'redcap.research.uts.edu.au',
-        path: '/api/'
+      let config:any = {
+        url: this.config.location,
+        path: this.config.path
       };
+      if(this.config.http != null) {
+        config = {
+          http: this.config.http,
+          host: this.config.host,
+          path: this.config.path
+        }
       //sails.log.debug(projectNotes.indexOf('Stash RDMP ID'));
       if (projectNotes.indexOf('Stash RDMP ID') == -1) {
         sails.log.debug('project id: ' + projectID);
@@ -108,7 +121,7 @@ export module Controllers {
             rdmpTitle: rdmpTitle,
             redcap_id: projectID,
             title: projectName,
-            location: this.config.location + "/redcap_v8.11.3/index.php?pid=" + projectID,
+            location: `${this.config.location}/${this.config.redcapVersion}/index.php?pid=${projectID}`,
             description: this.config.description, //'RedCap Workspace',
             type: this.config.recordType
           };

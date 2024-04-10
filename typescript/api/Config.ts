@@ -1,3 +1,5 @@
+declare var _;
+
 export class Config {
   host: string;
   recordType: string;
@@ -15,22 +17,28 @@ export class Config {
   key: any;
   location: string;
   description: string;
+  path: string;
+  redcapVersion: string;
+  http: string;
 
   constructor(workspaces) {
     const workspaceConfig = workspaces;
     const rc = workspaceConfig.redcap;
 
-    this.host = rc.host;
-    this.recordType = rc.recordType;
-    this.workflowStage = rc.workflowStage;
-    this.formName = rc.formName;
-    this.appName = rc.appName;
-    this.domain = rc.domain;
+    this.http = _.get(rc,'http');
+    this.host = _.get(rc,'host');
+    this.recordType = _.get(rc,'recordType');
+    this.workflowStage =  _.get(rc,'workflowStage');
+    this.formName =  _.get(rc,'formName');
+    this.appName =  _.get(rc,'appName');
+    this.domain =  _.get(rc,'domain');
+    this.path =  _.get(rc,'apiPath', '/api/');
+    this.redcapVersion =  _.get(rc,'redcapVersion', 'redcap_v14.0.15');
     this.parentRecord = workspaceConfig.parentRecord;
     this.provisionerUser = workspaceConfig.provisionerUser;
 
-    this.location = rc.location;
-    this.description = rc.description;
+    this.location = _.get(rc,'location')
+    this.description = _.get(rc,'description')
 
     this.brandingAndPortalUrl = '';
     this.redboxHeaders = {
@@ -38,11 +46,11 @@ export class Config {
       'Content-Type': 'application/json',
       'Authorization': workspaceConfig.portal.authorization,
     };
-    this.defaultGroupId = rc.defaultGroupId;
+    this.defaultGroupId = _.get(rc,'defaultGroupId');
 
-    this.types = rc.types;
-    this.workspaceFileName = rc.workspaceFileName;
-    this.key = rc.key;
+    this.types = _.get(rc,'types');
+    this.workspaceFileName = _.get(rc,'workspaceFileName');
+    this.key = _.get(rc,'key');
 
   }
 }

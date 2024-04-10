@@ -40,8 +40,12 @@ export module Services {
       formData.append('content', 'project');
       formData.append('format', 'json');
       formData.append('returnFormat', 'json');
-
-      let response = await axios.post(config.http + config.host + config.path, formData);
+      
+      let url = `${config.url}${config.path}`;
+      if(config.http != null) {
+        url = config.http + config.host + config.path;
+      }
+      let response = await axios.post(url, formData);
       return response.data;
     }
 
@@ -51,8 +55,11 @@ export module Services {
       formData.append('content', 'project_settings');
       formData.append('format', 'json');
       formData.append('data', new_notes);
-
-      let response = await axios.post(config.http + config.host + config.path, formData);
+      let url = `${config.url}${config.path}`;
+      if(config.http != null) {
+        url = config.http + config.host + config.path;
+      }
+      let response = await axios.post(url, formData);
       return response.data;
     }
   }
