@@ -4,9 +4,9 @@ declare var _;
 
 import { Observable } from 'rxjs';
 import 'rxjs/add/operator/map';
-import { Controllers as controllers } from '@researchdatabox/redbox-core-types';
+import { RecordsService, Controllers as controllers } from '@researchdatabox/redbox-core-types';
 
-declare var BrandingService, WorkspaceService, RedcapService;
+declare var BrandingService, WorkspaceService, RedcapService, RecordsService: RecordsService, RecordTypesService, WorkflowStepsService;
 /**
  * Package that contains all Controllers.
  */
@@ -57,9 +57,9 @@ export module Controllers {
     }
 
     public async link(req, res) {
-      
-      const userId = req.user.id;
-      const username = req.user.username;
+      const brand = BrandingService.getBrand(req.session.branding);
+      const user = req.user;
+
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
       const rdmp = req.param('rdmp');
       const project = req.param('workspace');
@@ -91,58 +91,78 @@ export module Controllers {
         let newNotesObject = {
           project_notes: `${projectNotes} Stash RDMP ID: ${rdmp}.`
         }
-        // newNotes = '{"project_notes":"' + projectNotes + ' Stash RDMP ID: ' + rdmp + '."}';
+
         newNotes = JSON.stringify(newNotesObject)
         sails.log.debug('New Project Notes: ' + newNotes);
-        let redCapResponse = await RedcapService.addlinkinfo(config, token, newNotes)
-        sails.log.debug(redCapResponse);
+        try {
+          let redCapResponse = await RedcapService.addlinkinfo(config, token, newNotes)
+          sails.log.debug(redCapResponse);
 
 
-        WorkspaceService.getRecordMeta(this.config, rdmp).flatMap(response => {
-          recordMetadata = response;
+          let recordMetadata = await RecordsService.getMeta(rdmp);
           rdmpTitle = recordMetadata.title;
-          //sails.log.debug(userId);
-          //sails.log.debug('RDMP id: ' + rdmp);
-          //sails.log.debug('RDMP title: ' + rdmpTitle);
-          //sails.log.debug(response);
+
 
           const record = {
             rdmpOid: rdmp,
             rdmpTitle: rdmpTitle,
-            id: projectID,
+            redcap_id: projectID,
             title: projectName,
             location: this.config.location + "/redcap_v8.11.3/index.php?pid=" + projectID,
             description: this.config.description, //'RedCap Workspace',
             type: this.config.recordType
           };
           //sails.log.debug(record);
-          return WorkspaceService.createWorkspaceRecord(
-            this.config, username, record, this.config.recordType, this.config.workflowStage
-          );
-        })
-          .flatMap(response => {
-            workspace = response;
-            sails.log.debug('creating workspace record');
-            sails.log.debug('Workspace Oid: ' + workspace.oid);
-            if (recordMetadata.workspaces) {
-              const wss = recordMetadata.workspaces.find(id => workspace.oid === id);
-              if (!wss) {
-                recordMetadata.workspaces.push({ id: workspace.oid });
-              }
-            }
-            return WorkspaceService.updateRecordMeta(this.config, recordMetadata, rdmp);
-          })
-          .subscribe(response => {
-            this.ajaxOk(req, res, null, { status: true, message: 'workspaceRecordCreated' });
-          }, error => {
-            sails.log.error('link: error');
-            sails.log.error(error);
-            this.ajaxFail(req, res, error.message, { status: false, message: error.message });
-          });
+          let workspace = await this.createRecordByType(brand, this.config.recordType, record, user);
+
+          sails.log.debug('creating workspace record');
+          await WorkspaceService.addWorkspaceToRecord(rdmp, workspace.oid);
+
+
+          this.ajaxOk(req, res, null, { status: true, message: 'workspaceRecordCreated' });
+
+        } catch (error) {
+          sails.log.error('link: error');
+          sails.log.error(error);
+          this.ajaxFail(req, res, error.message, { status: false, message: error.message });
+        }
       } else {
         this.ajaxOk(req, res, null, { status: true, message: 'Project has already been linked', linked: true });
       }
     }
+
+    async createRecordByType(brand: any, recordType: string, recordMetadata: any, user: any, targetStep: string = null) {
+      let record: any = {
+        metaMetadata: {}
+      };
+
+      record.authorization = {
+        view: [user.username],
+        edit: [user.username]
+      };
+      record.metaMetadata.brandId = brand.id;
+      record.metaMetadata.createdBy = user.username;
+      record.metaMetadata.type = recordType;
+      record.metadata = recordMetadata;
+
+      let recType = await RecordTypesService.get(brand, recordType).toPromise();
+
+      if (recType.packageType) {
+        record.metaMetadata.packageType = recType.packageType;
+      }
+
+      if (recType.packageName) {
+        record.metaMetadata.packageName = recType.packageName;
+      }
+      let wfStep = await WorkflowStepsService.getFirst(recType).toPromise();
+      if (targetStep) {
+        wfStep = await WorkflowStepsService.get(recType, targetStep).toPromise();
+      }
+
+      RecordsService.updateWorkflowStep(record, wfStep);
+      return await RecordsService.create(brand, record, recType, user);
+    }
+    
   }
 }
 module.exports = new Controllers.RedcapController().exports();
