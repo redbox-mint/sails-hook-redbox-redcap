@@ -5,3 +5,4 @@ support
 .nvmrc
 angular-legacy
 runForDev.sh
+typescript

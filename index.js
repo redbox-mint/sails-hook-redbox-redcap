@@ -13,7 +13,7 @@ module.exports = function (sails) {
   return {
     initialize: function (cb) {
      
-      global.ConfigService.mergeHookConfig('sails-hook-redbox-redcap', sails.config);
+      global.ConfigService.mergeHookConfig('@researchdatabox/sails-hook-redbox-redcap', sails.config);
       return cb();
     },
     //If each route middleware do not exist sails.lift will fail during hook.load()
