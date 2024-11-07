@@ -49,6 +49,7 @@ export class RedcapTokenField extends FieldBase<any> {
   constructor(options: any, injector: any) {
     super(options, injector);
     this.loading = true;
+    this.newlink = true;
     this.location = options['location'];
     this.columns = options['columns'] || [];
     this.tokenLabel = options['tokenLabel'] || 'Add token';
@@ -79,11 +80,16 @@ export class RedcapTokenField extends FieldBase<any> {
         this.project = res.project;
         this.tokenLoaded = true;
         this.tokenError = false;
+        // check if the project is already linked
+        if (res.linked === true) {
+          this.newlink = false;
+          this.linkLabel = "Already linked";
+        }
       } else {
-          this.errorMessage = res.message;
-          this.tokenLoaded = false;
-          this.tokenError = true;
-          this.invalidToken = 'Invalid REDCap project token. Please check on REDCap.';
+        this.errorMessage = res.message;
+        this.tokenLoaded = false;
+        this.tokenError = true;
+        this.invalidToken = 'Invalid REDCap project token. Please check on REDCap.';
       }
     } catch (e) {
       this.tokenError = true;
@@ -97,15 +103,14 @@ export class RedcapTokenField extends FieldBase<any> {
       this.processingStatus = 'Linking';
       const link = await this.redcapService.link(project, this.rdmp, this.token.token);
       this.processing = false;
-      if (!link.linked && link.message === 'workspaceRecordCreated') {
-        this.newlink = true;
+      if (link.status === true) {
         this.processingStatus = 'Success!';
-      } else if(link.message === 'Project has already been linked'){
-        this.newlink = false;
-        this.processingStatus = 'Already Linked with an RDMP';
-      } else
-      {
-        this.processingStatus = 'Error: Unable to link';
+      } else {
+        if (link.message) {
+          this.processingStatus = link.message;
+        } else {
+          this.processingStatus = 'Failed to link, please contact an administrator.';
+        }
       }
     } catch (e) {
       this.processing = false;
@@ -208,7 +213,7 @@ export class RedcapTokenField extends FieldBase<any> {
       </table>
       <div class="form-row">
         <p>
-          <button (click)="field.linkProject(field.project)" type="submit" [disabled]="!field.valid" class="btn btn-primary">
+          <button (click)="field.linkProject(field.project)" type="submit" [disabled]="field.newlink === false" class="btn btn-primary">
             {{ field.linkLabel }}
           </button>
         </p>

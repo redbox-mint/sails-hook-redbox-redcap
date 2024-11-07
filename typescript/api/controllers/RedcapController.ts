@@ -27,7 +27,7 @@ export module Controllers {
 
 
     protected config: Config;
-    //config: any;
+    protected logHeader = "RedcapController::";
 
     constructor() {
       super();
@@ -56,9 +56,15 @@ export module Controllers {
           }
         }
 
-        sails.log.error('Config:' + JSON.stringify(config))
+        sails.log.verbose(`${this.logHeader} project() -> Config: ${JSON.stringify(config)}`);
+        sails.log.verbose(`${this.logHeader} project() -> notesHeader: ${sails.config.redcap.notesHeader}`);
         const projectInfo = await RedcapService.project(config, token);
-        this.ajaxOk(req, res, null, { status: true, project: projectInfo });
+        let linked = false; 
+        if (projectInfo && projectInfo.project_notes) {
+          const projectNotes = projectInfo.project_notes;
+          linked = projectNotes.indexOf(sails.config.redcap.notesHeader) !== -1;
+        }
+        this.ajaxOk(req, res, null, { status: true, linked: linked, project: projectInfo });
       } catch (error) {
         this.ajaxFail(req, res, error.message, { status: false, message: error.message });
       }
@@ -98,25 +104,26 @@ export module Controllers {
           path: this.config.path
         }
       }
-      //sails.log.debug(projectNotes.indexOf('Stash RDMP ID'));
-      if (projectNotes.indexOf('Stash RDMP ID') == -1) {
+      const notesHeader = sails.config.redcap.notesHeader;
+      if (projectNotes.indexOf(notesHeader) == -1) {
         sails.log.debug('project id: ' + projectID);
         sails.log.debug('project description: ' + projectNotes);
         let newNotesObject = {
-          project_notes: `${projectNotes} Stash RDMP ID: ${rdmp}.`
+          project_notes: `${projectNotes} ${notesHeader}: ${rdmp}.`
         }
 
         newNotes = JSON.stringify(newNotesObject)
         sails.log.debug('New Project Notes: ' + newNotes);
         try {
-          let redCapResponse = await RedcapService.addlinkinfo(config, token, newNotes)
-          sails.log.debug(redCapResponse);
-
-
           let recordMetadata = await RecordsService.getMeta(rdmp);
+          if (_.isEmpty(recordMetadata)) {
+            sails.log.error(`${this.logHeader} link() -> Failed to find RDMP: ${rdmp}`);
+            throw new Error(`Failed to find RDMP: ${rdmp}, please contact an administrator`);
+          }
+          let redCapResponse = await RedcapService.addlinkinfo(config, token, newNotes)
+          sails.log.verbose(`${this.logHeader} link() -> Redcap response:`);
+          sails.log.verbose(redCapResponse);
           rdmpTitle = recordMetadata.title;
-
-
           const record = {
             rdmpOid: rdmp,
             rdmpTitle: rdmpTitle,
@@ -129,19 +136,27 @@ export module Controllers {
           //sails.log.debug(record);
           let workspace = await this.createRecordByType(brand, this.config.recordType, record, user);
 
-          sails.log.debug('creating workspace record');
-          await WorkspaceService.addWorkspaceToRecord(rdmp, workspace.oid);
-
-
+          if (workspace.isSuccessful()) {
+            const appendWsResp = await WorkspaceService.addWorkspaceToRecord(rdmp, workspace.oid);
+            if (!appendWsResp.isSuccessful()) {
+              sails.log.error(`${this.logHeader} link() -> Appending workspace to record failed:`);
+              sails.log.error(appendWsResp);
+              throw new Error(`Failed to append workspace to RDMP record`);
+            }
+          } else {
+            sails.log.error(`${this.logHeader} link() -> Failed to create workspace record:`);
+            sails.log.error(workspace);
+            throw new Error(`Failed to add workspace record`);
+          }
           this.ajaxOk(req, res, null, { status: true, message: 'workspaceRecordCreated' });
 
         } catch (error) {
-          sails.log.error('link: error');
+          sails.log.error(`${this.logHeader} link() -> Failed to link project:`);
           sails.log.error(error);
-          this.ajaxFail(req, res, error.message, { status: false, message: error.message });
+          this.ajaxFail(req, res, error.message, { status: false, message: `Failed to link project with RDMP, please contact an administrator.` });
         }
       } else {
-        this.ajaxOk(req, res, null, { status: true, message: 'Project has already been linked', linked: true });
+        this.ajaxFail(req, res, null, { status: false, message: `Project has already been linked to an RDMP, see '${notesHeader}' value in the 'Notes' section.`, linked: true });
       }
     
   }
@@ -174,10 +189,38 @@ export module Controllers {
         wfStep = await WorkflowStepsService.get(recType, targetStep).toPromise();
       }
 
-      RecordsService.updateWorkflowStep(record, wfStep);
+      this.setWorkflowStepRelatedMetadata(record, wfStep);
       return await RecordsService.create(brand, record, recType, user);
     }
-    
+
+    protected setWorkflowStepRelatedMetadata(currentRec: any, nextStep: any) {
+      if (!_.isEmpty(nextStep)) {
+        sails.log.verbose('setWorkflowStepRelatedMetadata - enter');
+        sails.log.verbose(nextStep);
+
+        currentRec.previousWorkflow = currentRec.workflow;
+        currentRec.workflow = nextStep.config.workflow;
+        // TODO: validate data with form fields
+        currentRec.metaMetadata.form = nextStep.config.form;
+        // Check for JSON-LD config
+        if (sails.config.jsonld.addJsonLdContext) {
+          currentRec.metadata['@context'] = sails.config.jsonld.contexts[currentRec.metaMetadata.form];
+        }
+        //TODO: if this was all typed we probably don't need these sorts of initialisations
+        if(currentRec.authorization == undefined) {
+          currentRec.authorization = {
+            viewRoles:[],
+            editRoles:[],
+            edit:[],
+            view:[]
+          };
+        }
+        
+        // update authorizations based on workflow...
+        currentRec.authorization.viewRoles = nextStep.config.authorization.viewRoles;
+        currentRec.authorization.editRoles = nextStep.config.authorization.editRoles;
+      }
+    } 
   }
 }
 module.exports = new Controllers.RedcapController().exports();
