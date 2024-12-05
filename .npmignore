@@ -1,0 +1,9 @@
+.tmp
+.circleci
+support
+*.tgz
+.nvmrc
+angular-legacy
+runForDev.sh
+typescript
+support/development

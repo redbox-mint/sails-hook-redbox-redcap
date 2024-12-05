@@ -2,66 +2,86 @@ declare var module;
 declare var sails, Model;
 declare var _;
 
-import {Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 import 'rxjs/add/operator/map';
+import { RecordsService, Controllers as controllers } from '@researchdatabox/redbox-core-types';
 
-declare var BrandingService, WorkspaceService, RedcapService;
+declare var BrandingService, WorkspaceService, RedcapService, RecordsService: RecordsService, RecordTypesService, WorkflowStepsService;
 /**
  * Package that contains all Controllers.
  */
-import controller = require('../core/CoreController');
-import {Config} from '../Config';
+
+import { Config } from '../Config';
 
 export module Controllers {
   /**
    * Redcap related features....
    *
    */
-  export class RedcapController extends controller.Controllers.Core.Controller {
+  export class RedcapController extends controllers.Core.Controller {
 
     protected _exportedMethods: any = [
       'project',
       'link'
     ];
 
-    _config: any;
+
     protected config: Config;
-    token: string;
-    //config: any;
+    protected logHeader = "RedcapController::";
 
     constructor() {
       super();
-      this.config = new Config(sails.config.workspaces);
+      let that = this;
+      sails.after(['ready'], function () {
+        that.config = new Config(sails.config.workspaces);
+      });
+
     }
 
     public async project(req, res) {
-      try{
+      try {
         var tokenReq = req.param('token');
-        this.token = tokenReq.token;
-        sails.log.debug(this.token);
-        const config = {
-          http: 'https://',
-          host: 'redcap.research.uts.edu.au',
-          path: '/api/'
+        const token = tokenReq.token;
+        sails.log.debug(token);
+        sails.log.error('Config Object:' + JSON.stringify(this.config))
+        let config:any = {
+          url: this.config.location,
+          path: this.config.path
         };
-        const projectInfo = await RedcapService.project(config, tokenReq.token);
-        this.ajaxOk(req, res, null, {status: true, project: projectInfo});
+        if(this.config.http != null) {
+          config = {
+            http: this.config.http,
+            host: this.config.host,
+            path: this.config.path
+          }
+        }
+
+        sails.log.verbose(`${this.logHeader} project() -> Config: ${JSON.stringify(config)}`);
+        sails.log.verbose(`${this.logHeader} project() -> notesHeader: ${sails.config.redcap.notesHeader}`);
+        const projectInfo = await RedcapService.project(config, token);
+        let linked = false; 
+        if (projectInfo && projectInfo.project_notes) {
+          const projectNotes = projectInfo.project_notes;
+          linked = projectNotes.indexOf(sails.config.redcap.notesHeader) !== -1;
+        }
+        this.ajaxOk(req, res, null, { status: true, linked: linked, project: projectInfo });
       } catch (error) {
-        this.ajaxFail(req, res, error.message, {status: false, message: error.message});
+        this.ajaxFail(req, res, error.message, { status: false, message: error.message });
       }
     }
 
-    public link(req, res){
-      sails.log.debug('Token to be linked is: ' + this.token);
-      const userId = req.user.id;
-      const username = req.user.username;
+    public async link(req, res) {
+      const brand = BrandingService.getBrand(req.session.branding);
+      const user = req.user;
+
       this.config.brandingAndPortalUrl = BrandingService.getFullPath(req);
       const rdmp = req.param('rdmp');
       const project = req.param('workspace');
-
+      const token = req.param('token');
+      sails.log.debug('Token to be linked is: ' + token);
       if (!project || !rdmp) {
         const message = 'rdmp, project are missing';
-        this.ajaxFail(req, res, message, {status: false, message: message});
+        this.ajaxFail(req, res, message, { status: false, message: message });
         return;
       }
 
@@ -73,67 +93,134 @@ export module Controllers {
       let workspace: any = null;
       let rdmpTitle = '';
       let recordMetadata = null;
-      const config = {
-        http: 'https://',
-        host: 'redcap.research.uts.edu.au',
-        path: '/api/'
+      let config:any = {
+        url: this.config.location,
+        path: this.config.path
       };
-      //sails.log.debug(projectNotes.indexOf('Stash RDMP ID'));
-      if(projectNotes.indexOf('Stash RDMP ID') == -1) {
+      if(this.config.http != null) {
+        config = {
+          http: this.config.http,
+          host: this.config.host,
+          path: this.config.path
+        }
+      }
+      const notesHeader = sails.config.redcap.notesHeader;
+      if (projectNotes.indexOf(notesHeader) == -1) {
         sails.log.debug('project id: ' + projectID);
         sails.log.debug('project description: ' + projectNotes);
-        newNotes = '{"project_notes":"' + projectNotes + ' Stash RDMP ID: ' + rdmp + '."}';
-        sails.log.debug('New Project Notes: ' + newNotes);
-        RedcapService.addlinkinfo(config, this.token, newNotes)
-          .flatMap(response => {
-            sails.log.debug(response);
-            return WorkspaceService.getRecordMeta(this.config, rdmp);
-          })
-          .flatMap(response => {
-            recordMetadata = response;
-            rdmpTitle = recordMetadata.title;
-            //sails.log.debug(userId);
-            //sails.log.debug('RDMP id: ' + rdmp);
-            //sails.log.debug('RDMP title: ' + rdmpTitle);
-            //sails.log.debug(response);
+        let newNotesObject = {
+          project_notes: `${projectNotes} ${notesHeader}: ${rdmp}.`
+        }
 
-            const record = {
-              rdmpOid: rdmp,
-              rdmpTitle: rdmpTitle,
-              id: projectID,
-              title: projectName,
-              location: this.config.location + "/redcap_v8.11.3/index.php?pid=" + projectID,
-              description: this.config.description, //'RedCap Workspace',
-              type: this.config.recordType
-            };
-            //sails.log.debug(record);
-            return WorkspaceService.createWorkspaceRecord(
-              this.config, username, record, this.config.recordType, this.config.workflowStage
-            );
-          })
-          .flatMap(response => {
-            workspace = response;
-            sails.log.debug('creating workspace record');
-            sails.log.debug('Workspace Oid: ' + workspace.oid);
-            if (recordMetadata.workspaces) {
-              const wss = recordMetadata.workspaces.find(id => workspace.oid === id);
-              if (!wss) {
-                recordMetadata.workspaces.push({id: workspace.oid});
-              }
+        newNotes = JSON.stringify(newNotesObject)
+        sails.log.debug('New Project Notes: ' + newNotes);
+        try {
+          let recordMetadata = await RecordsService.getMeta(rdmp);
+          if (_.isEmpty(recordMetadata)) {
+            sails.log.error(`${this.logHeader} link() -> Failed to find RDMP: ${rdmp}`);
+            throw new Error(`Failed to find RDMP: ${rdmp}, please contact an administrator`);
+          }
+          let redCapResponse = await RedcapService.addlinkinfo(config, token, newNotes)
+          sails.log.verbose(`${this.logHeader} link() -> Redcap response:`);
+          sails.log.verbose(redCapResponse);
+          rdmpTitle = recordMetadata.title;
+          const record = {
+            rdmpOid: rdmp,
+            rdmpTitle: rdmpTitle,
+            redcap_id: projectID,
+            title: projectName,
+            location: `${this.config.location}/${this.config.redcapVersion}/index.php?pid=${projectID}`,
+            description: this.config.description, //'RedCap Workspace',
+            type: this.config.recordType
+          };
+          //sails.log.debug(record);
+          let workspace = await this.createRecordByType(brand, this.config.recordType, record, user);
+
+          if (workspace.isSuccessful()) {
+            const appendWsResp = await WorkspaceService.addWorkspaceToRecord(rdmp, workspace.oid);
+            if (!appendWsResp.isSuccessful()) {
+              sails.log.error(`${this.logHeader} link() -> Appending workspace to record failed:`);
+              sails.log.error(appendWsResp);
+              throw new Error(`Failed to append workspace to RDMP record`);
             }
-            return WorkspaceService.updateRecordMeta(this.config, recordMetadata, rdmp);
-          })
-          .subscribe(response => {
-            this.ajaxOk(req, res, null, {status: true, message: 'workspaceRecordCreated'});
-          }, error => {
-            sails.log.error('link: error');
-            sails.log.error(error);
-            this.ajaxFail(req, res, error.message, {status: false, message: error.message});
-          });
+          } else {
+            sails.log.error(`${this.logHeader} link() -> Failed to create workspace record:`);
+            sails.log.error(workspace);
+            throw new Error(`Failed to add workspace record`);
+          }
+          this.ajaxOk(req, res, null, { status: true, message: 'workspaceRecordCreated' });
+
+        } catch (error) {
+          sails.log.error(`${this.logHeader} link() -> Failed to link project:`);
+          sails.log.error(error);
+          this.ajaxFail(req, res, error.message, { status: false, message: `Failed to link project with RDMP, please contact an administrator.` });
+        }
       } else {
-        this.ajaxOk(req, res, null, {status: true, message: 'Project has already been linked', linked: true});
+        this.ajaxFail(req, res, null, { status: false, message: `Project has already been linked to an RDMP, see '${notesHeader}' value in the 'Notes' section.`, linked: true });
       }
+    
+  }
+
+    async createRecordByType(brand: any, recordType: string, recordMetadata: any, user: any, targetStep: string = null) {
+      let record: any = {
+        metaMetadata: {}
+      };
+
+      record.authorization = {
+        view: [user.username],
+        edit: [user.username]
+      };
+      record.metaMetadata.brandId = brand.id;
+      record.metaMetadata.createdBy = user.username;
+      record.metaMetadata.type = recordType;
+      record.metadata = recordMetadata;
+
+      let recType = await RecordTypesService.get(brand, recordType).toPromise();
+
+      if (recType.packageType) {
+        record.metaMetadata.packageType = recType.packageType;
+      }
+
+      if (recType.packageName) {
+        record.metaMetadata.packageName = recType.packageName;
+      }
+      let wfStep = await WorkflowStepsService.getFirst(recType).toPromise();
+      if (targetStep) {
+        wfStep = await WorkflowStepsService.get(recType, targetStep).toPromise();
+      }
+
+      this.setWorkflowStepRelatedMetadata(record, wfStep);
+      return await RecordsService.create(brand, record, recType, user);
     }
+
+    protected setWorkflowStepRelatedMetadata(currentRec: any, nextStep: any) {
+      if (!_.isEmpty(nextStep)) {
+        sails.log.verbose('setWorkflowStepRelatedMetadata - enter');
+        sails.log.verbose(nextStep);
+
+        currentRec.previousWorkflow = currentRec.workflow;
+        currentRec.workflow = nextStep.config.workflow;
+        // TODO: validate data with form fields
+        currentRec.metaMetadata.form = nextStep.config.form;
+        // Check for JSON-LD config
+        if (sails.config.jsonld.addJsonLdContext) {
+          currentRec.metadata['@context'] = sails.config.jsonld.contexts[currentRec.metaMetadata.form];
+        }
+        //TODO: if this was all typed we probably don't need these sorts of initialisations
+        if(currentRec.authorization == undefined) {
+          currentRec.authorization = {
+            viewRoles:[],
+            editRoles:[],
+            edit:[],
+            view:[]
+          };
+        }
+        
+        // update authorizations based on workflow...
+        currentRec.authorization.viewRoles = nextStep.config.authorization.viewRoles;
+        currentRec.authorization.editRoles = nextStep.config.authorization.editRoles;
+      }
+    } 
   }
 }
 module.exports = new Controllers.RedcapController().exports();

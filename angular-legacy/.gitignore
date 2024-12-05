@@ -1,14 +1,16 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-angular-legacy/shared
-angular-legacy/dist
-assets/angular
-assets/default/default/images/leaflet
+# compiled output
+dist/*
+/tmp
+/out-tsc
+shared/*
+
 # dependencies
-node_modules
+/node_modules
 
 # IDEs and editors
-.idea
+/.idea
 .project
 .classpath
 .c9/
@@ -29,18 +31,14 @@ node_modules
 /coverage
 /libpeerconnection.log
 npm-debug.log
-yarn-error.log
 testem.log
 /typings
+yarn-error.log
 
 # e2e
-e2e/*.js
-e2e/*.map
+/e2e/*.js
+/e2e/*.map
 
 # System Files
 .DS_Store
 Thumbs.db
-
-sailsWorkingDir
-api/*
-assets/angular
