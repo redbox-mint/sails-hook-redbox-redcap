@@ -8,7 +8,7 @@ x-rbportal-env: &rbportal-env
   - sails_redbox__mochaTesting=true
   - sails_security__csrf=false
   - LOAD_DEFAULT_FORMS=true
-  - CI=${CI:-false}
+  - CI=false
   - RBPORTAL_COVERAGE_DIR=/tmp/coverage/mocha
 
 x-rbportal-depends: &rbportal-depends
