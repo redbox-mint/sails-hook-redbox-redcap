@@ -1,5 +1,5 @@
 import { Layer, Logger, LogLevel } from 'effect';
-import type { RedcapConfigData } from '../../configmodels/RedcapAppConfig';
+import type { RedcapConfigData } from '../../../config/redcap';
 import { RedcapConfigTag, RedcapHttpClientTag, RedcapRunContextTag, type RedcapRunContext } from './context';
 import { makeLiveClient } from './http';
 

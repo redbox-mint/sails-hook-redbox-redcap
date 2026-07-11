@@ -17,10 +17,11 @@ The package contains the compiled hook under `dist` and the embedded client unde
 `assets/angular/redcap/browser`. It uses the ReDBox shared dependency contract; the
 portal supplies `@researchdatabox/redbox-core`.
 
-## Per-brand Application Configuration
+## REDCap configuration
 
-REDCap is disabled by default. Create a `redcap` Application Configuration for every
-brand that may use the integration and explicitly set `enabled: true`.
+REDCap is registered under `sails.config.redcap` and exposes a brand-specific
+Application Configuration model. It is disabled by default. Configure `redcap` for
+each brand that may use the integration and explicitly set `enabled: true`.
 
 ```json
 {
@@ -47,10 +48,11 @@ brand that may use the integration and explicitly set `enabled: true`.
 }
 ```
 
-Configuration is resolved from the RDMP's `metaMetadata.brandId`. Missing or unknown
-brands fail closed. There is deliberately no fallback to `workspaces.redcap`; existing
-deployments must migrate that configuration before enabling this v5 hook. API tokens
-are supplied interactively per request and are never persisted.
+Configuration is resolved from the RDMP's `metaMetadata.brandId` through
+`sails.config.brandingAware`. Missing or unknown brands fail closed. There is
+deliberately no fallback to `workspaces.redcap`; existing deployments must migrate
+that configuration to `redcap` before enabling this v5 hook. API tokens are supplied
+interactively per request and are never persisted.
 
 ## Endpoints
 

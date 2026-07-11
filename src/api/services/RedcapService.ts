@@ -1,6 +1,6 @@
 import { Services as CoreServices } from '@researchdatabox/redbox-core';
 import { Cause, Duration, Effect, Exit, Fiber } from 'effect';
-import { REDCAP_CONFIG_KEY, RedcapAppConfig, type RedcapConfigData } from '../configmodels/RedcapAppConfig';
+import { REDCAP_CONFIG_KEY, createRedcapConfig, type RedcapConfigData } from '../../config/redcap';
 import { completeAudit, failAudit, RedcapAuditAction, registerRedcapOutcomeMapper, startAudit, withRedcapAudit, type IntegrationAuditContext } from './redcap/audit';
 import { RedcapConfigTag, RedcapHttpClientTag, RedcapRunContextTag, type RedcapRunContext } from './redcap/context';
 import { BrandResolutionError, InvalidRequestError, RdmpLookupError, RedcapConfigError, RedcapDecodeError, RedcapTotalTimeoutError, WorkspaceAssociationError, WorkspaceCreationError, errorDescription, type RedcapError } from './redcap/errors';
@@ -146,20 +146,20 @@ export namespace Services {
     private brandConfig(oid: string, brandName: string): RedcapConfigData {
       const aware = (sails.config as unknown as { brandingAware?: (name: string) => Record<string, unknown> }).brandingAware;
       let value: unknown; try { value = aware?.(brandName)?.[REDCAP_CONFIG_KEY]; } catch { value = undefined; }
-      if (!value) throw new RedcapConfigError({ message: `REDCap Application Configuration is missing for brand '${brandName}'.`, status: 503 });
-      const config = merge(new RedcapAppConfig() as RedcapConfigData, value); this.validateConfig(oid, config); return config;
+      if (!value) throw new RedcapConfigError({ message: `REDCap configuration is missing for brand '${brandName}'.`, status: 503 });
+      const config = merge(createRedcapConfig(), value); this.validateConfig(oid, config); return config;
     }
     private resolveTokenOnlyConfig() {
       const value = (sails.config as unknown as Record<string, unknown>)[REDCAP_CONFIG_KEY];
       if (!value) throw new RedcapConfigError({ message: 'REDCap token-only validation routing is not configured.', status: 503 });
-      const config = merge(new RedcapAppConfig() as RedcapConfigData, value); this.validateConfig('', config);
+      const config = merge(createRedcapConfig(), value); this.validateConfig('', config);
       return { brand: {}, brandId: '', brandName: '', config };
     }
     private validateConfig(oid: string, config: RedcapConfigData): void {
       if (!config.enabled) throw new RedcapConfigError({ message: 'REDCap integration is disabled for this brand.', status: 503 });
       try { const url = new URL(config.connection.url); if (!['http:', 'https:'].includes(url.protocol)) throw new Error(); } catch { throw new RedcapConfigError({ message: 'REDCap URL must be absolute.', status: 500 }); }
       const r = config.connection.retry; if (config.connection.timeoutMs <= 0 || config.connection.totalTimeoutMs <= 0 || !Number.isInteger(r.maxAttempts) || r.maxAttempts < 1 || r.baseDelayMs < 0 || r.maxDelayMs < 0 || !config.notesHeader.trim())
-        throw new RedcapConfigError({ message: `Invalid REDCap Application Configuration for '${oid}'.`, status: 500 });
+        throw new RedcapConfigError({ message: `Invalid REDCap configuration for '${oid}'.`, status: 500 });
     }
     private safeEndpoint(config: RedcapConfigData): string { const url = new URL(endpoint(config)); return `${url.host}${url.pathname}`; }
     private async runTracked<A>(program: Effect.Effect<A, RedcapError, never>): Promise<Exit.Exit<A, RedcapError>> {

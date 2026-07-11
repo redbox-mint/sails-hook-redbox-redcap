@@ -1,5 +1,5 @@
 import { Duration, Effect, Ref, Schedule } from 'effect';
-import type { RedcapConfigData } from '../../configmodels/RedcapAppConfig';
+import type { RedcapConfigData } from '../../../config/redcap';
 import type { RedcapRunContext } from './context';
 import { RedcapDecodeError, RedcapHttpError, RedcapRequestTimeoutError, RedcapTransportError } from './errors';
 

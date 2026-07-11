@@ -1,5 +1,5 @@
 import { Context } from 'effect';
-import type { RedcapConfigData } from '../../configmodels/RedcapAppConfig';
+import type { RedcapConfigData } from '../../../config/redcap';
 import type { IntegrationAuditContext } from './audit';
 import type { RedcapHttpClient } from './http';
 

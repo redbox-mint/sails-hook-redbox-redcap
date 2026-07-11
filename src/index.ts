@@ -1,7 +1,8 @@
 import '@researchdatabox/redbox-core';
 import { defineRedboxHook, type HookRegistrationMap } from '@researchdatabox/redbox-core';
 import type { FormConfigFrame } from '@researchdatabox/sails-ng-common';
-import { REDCAP_CONFIG_MODEL } from './api/configmodels/RedcapAppConfig';
+import * as path from 'path';
+import { REDCAP_CONFIG_MODEL } from './api/configmodels/RedcapConfig';
 import type { HookRedboxControllers } from './api/controllers';
 import type { HookRedboxServices } from './api/services';
 import { recordtypes } from './config/recordtypes';
@@ -14,10 +15,20 @@ const hook = defineRedboxHook({
   initialize(sails, done) {
     sails.after('hook:moduleloader:loaded', () => {
       try {
-        const service = (sails.services as Record<string, unknown>)?.appconfigservice as { registerConfigModel?: (model: Record<string, unknown>) => void } | undefined;
-        if (!service?.registerConfigModel) sails.log.warn('sails-hook-redbox-redcap: AppConfigService unavailable; REDCap remains disabled.');
-        else service.registerConfigModel({ ...REDCAP_CONFIG_MODEL });
-      } catch (error) { sails.log.warn('sails-hook-redbox-redcap: REDCap AppConfig registration failed; integration remains disabled.', error); }
+        const appConfigService = (sails.services as Record<string, unknown>)?.appconfigservice as {
+          registerConfigModel?: (model: Record<string, unknown>) => void;
+        } | undefined;
+        if (appConfigService?.registerConfigModel) {
+          appConfigService.registerConfigModel({
+            ...REDCAP_CONFIG_MODEL,
+            tsGlob: path.join(__dirname, '../src/api/configmodels/*.ts')
+          });
+        } else {
+          sails.log.warn('sails-hook-redbox-redcap: AppConfigService unavailable; skipping REDCap config model registration.');
+        }
+      } catch (error) {
+        sails.log.error('sails-hook-redbox-redcap: Failed to register REDCap config model:', error);
+      }
     });
     done();
   },

@@ -13,8 +13,24 @@ describe('REDCap hook registration', () => {
     expect(module.registerRedboxConfig()).to.have.keys('redcap', 'recordtype', 'workflow', 'workspacetype');
     expect(hook.routes.after).to.have.keys('POST /:branding/:portal/ws/redcap/project', 'POST /:branding/:portal/ws/redcap/link');
   });
-  it('does not crash when AppConfigService is absent', done => {
+  it('initializes without an AppConfig service', done => {
     const module = require(path); const hook = module((globalThis as any).sails);
     hook.initialize((error?: unknown) => done(error));
+  });
+
+  it('registers the REDCap AppConfig model after module loading', done => {
+    const registered: Record<string, unknown>[] = [];
+    (globalThis as any).sails.services.appconfigservice = {
+      registerConfigModel: (model: Record<string, unknown>) => registered.push(model)
+    };
+    delete require.cache[path];
+    const module = require(path); const hook = module((globalThis as any).sails);
+    hook.initialize((error?: unknown) => {
+      expect(error).to.equal(undefined);
+      expect(registered).to.have.length(1);
+      expect(registered[0]).to.include({ key: 'redcap', modelName: 'RedcapConfig' });
+      expect(registered[0].tsGlob).to.be.a('string');
+      done();
+    });
   });
 });
