@@ -1,0 +1,15 @@
+<section class="redcap-card" aria-labelledby="redcap-title">
+  <h2 id="redcap-title">REDCap workspace</h2>
+  <ng-container *ngIf="!project">
+    <label for="redcap-token">REDCap Project API Token</label>
+    <input id="redcap-token" type="password" autocomplete="off" [(ngModel)]="token" [disabled]="loading">
+    <button type="button" class="btn btn-primary" (click)="validate()" [disabled]="loading || !token.trim()">{{ loading ? 'Validating…' : 'Validate project' }}</button>
+    <div class="help"><strong>To get your REDCap API token:</strong><ol><li>Open your institution's configured REDCap site.</li><li>Open or create a project and request API permissions.</li><li>Generate the project API token and paste it above.</li></ol></div>
+  </ng-container>
+  <div *ngIf="project" class="project" aria-live="polite">
+    <dl><dt>Project ID</dt><dd>{{ project.project_id }}</dd><dt>Project title</dt><dd>{{ project.project_title }}</dd><dt>Notes</dt><dd>{{ project.project_notes || '—' }}</dd></dl>
+    <button type="button" class="btn btn-primary" (click)="link()" [disabled]="linked || linking">{{ linked ? 'Already linked' : linking ? 'Linking…' : 'Link to Plan' }}</button>
+  </div>
+  <p *ngIf="message" class="status" role="status">{{ message }}</p>
+  <a class="btn btn-info" [href]="baseUrl + '/record/edit/' + rdmp + '?focusTabId=workspaces'">Back to your Plan</a>
+</section>

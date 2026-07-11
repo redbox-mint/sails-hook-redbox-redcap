@@ -1,102 +1,88 @@
-## A Sails Hook Redbox - REDCap
+# ReDBox REDCap hook
 
-In this example template you will find the barebones requirements for a Hook
+Native ReDBox v5 hook for validating a REDCap project and linking it to an RDMP workspace.
 
-This Project is divided between folders
+## Install and build
 
-## api
+Use Node from `.nvmrc` and install the package into a supported ReDBox Portal:
 
-Main API of your Hook can be stored in controllers and services
-
-- controllers
-- services
-
-## config & form-config
-
-This configurations are redbox-portal dependent. They will allow redbox to be available as a record
-If you require to have a form in your portal
-
-- `config/recordtype`
-- `config/workflow`
-- `form-config/template-1.0-draft`
-- `config/env/development.js
+```bash
+nvm use
+npm install
+npm run compile
+npm run build:angular
 ```
-redcap: {
-      parentRecord: 'rdmp',
-      formName: 'redcap-1.0-draft',
-      workflowStage: 'draft',
-      appName: 'redcap',
-      appId: 'redcap',
-      recordType: 'redcap',
-      location: 'https://redcap.research.uts.edu.au',
-      description: 'REDCap Workspace'
+
+The package contains the compiled hook under `dist` and the embedded client under
+`assets/angular/redcap/browser`. It uses the ReDBox shared dependency contract; the
+portal supplies `@researchdatabox/redbox-core`.
+
+## Per-brand Application Configuration
+
+REDCap is disabled by default. Create a `redcap` Application Configuration for every
+brand that may use the integration and explicitly set `enabled: true`.
+
+```json
+{
+  "enabled": true,
+  "connection": {
+    "url": "https://redcap.example.edu/",
+    "apiPath": "/api/",
+    "redcapVersion": "redcap_v14.0.15",
+    "timeoutMs": 30000,
+    "totalTimeoutMs": 120000,
+    "retry": {
+      "maxAttempts": 3,
+      "baseDelayMs": 1000,
+      "maxDelayMs": 10000,
+      "retryOnStatusCodes": [408, 429, 500, 502, 503, 504]
     }
+  },
+  "workspace": {
+    "recordType": "redcap",
+    "workflowStage": "draft",
+    "description": "REDCap Workspace"
+  },
+  "notesHeader": "RDMP ID"
+}
 ```
 
-## index
+Configuration is resolved from the RDMP's `metaMetadata.brandId`. Missing or unknown
+brands fail closed. There is deliberately no fallback to `workspaces.redcap`; existing
+deployments must migrate that configuration before enabling this v5 hook. API tokens
+are supplied interactively per request and are never persisted.
 
-Main entry point for the hook
+## Endpoints
 
-### initialize
+- `POST /:branding/:portal/ws/redcap/project` accepts `{ "token": "...", "rdmp": "..." }`.
+  The historical `{ "token": { "token": "..." } }` shape and token-only calls remain
+  accepted. Token-only validation has no RDMP audit context.
+- `POST /:branding/:portal/ws/redcap/link` accepts
+  `{ "rdmp": "...", "workspace": { ...project }, "token": "..." }`.
 
-Init code before it gets hooked.
+Responses retain the existing `{ status, linked?, project?, message? }` contract.
+Only individual transient REDCap HTTP requests are retried; the link orchestration and
+workspace creation are never retried.
 
-### routes
+## Audit behavior
 
-Controller routes exposed to the sails front-end
+Validation emits `validateProject` and `redcapProjectRequest` audits when an RDMP is
+provided. Linking emits `linkProject`, `redcapProjectSettingsUpdate`, `workspaceCreate`,
+and `associateWorkspace` in one trace. Audit failures are best-effort and never fail the
+integration. If REDCap notes update before a later ReDBox failure, the successful child
+audit remains visible. Tokens and request bodies are excluded from summaries.
 
-```javascript
-'get /your/route' : YourController.method
+## Development and verification
+
+```bash
+npm run compile
+npm run test:unit
+npm run build:angular
+npm run test:angular
+npm run test:integration:mocha
+npm pack --dry-run
+./node_modules/.bin/redbox-dev-tools check
 ```
 
-### configure
-
-Add configuration and services to your sails app
-
-```javascript
-sails.services['YourService'] = function() { };
-sails.config = _.merge(sails.config, {object});
-```
-
-## test
-
-First run `npm install`
-
-Test your sails hook with mocha by running `npm test` before adding the hook to your redbox-portal.
-It may cause your application to not lift.    
-
-```sh
-$ npm test
-
-> @uts-eresearch/sails-hook-redbox-template@1.0.0 test /Users/moises/source/code.research/sails-hook-redbox-template
-> NODE_ENV=test node_modules/.bin/mocha
-
-
-
-  Basic tests ::
-    ✓ should have a service
-    ✓ should have a form
-    ✓ should have a route
-    ✓ sails does not crash
-
-
-  4 passing (864ms)
-
-```
-
-For more information on testing your hook go to : https://sailsjs.com/documentation/concepts/testing
-
-
-## Development in redbox-portal
-
-A docker-compose.yml file is present in support/development and is setup to run the full ReDBox stack and install the hook. To run the stack there is a ReDBox Sails Hook Run Utility in the root of the project
-
-Usage
-```
-ReDBox Sails Hook Run Utility
-Usage: ./runForDev.sh [-a|--(no-)angular] [-h|--help]
-	-a,--angular,--no-angular: Angular mode. Will ensure permissions are set correctly on the Sails working directory so that changes can be applied (off by default)
-	-h,--help: Prints help
-```
-
-Note: The first time the stack runs it may take some time as yarn initialises the hook within ReDBox Portal. All subsequent runs should be faster
+The integration suite requires Docker and a sibling `redbox-portal` checkout as used by
+the standard v5 development compose layout.

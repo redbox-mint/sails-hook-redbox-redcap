@@ -1,0 +1,41 @@
+const { _ } = require('@researchdatabox/redbox-dev-tools/testing');
+
+type LogFn = (...args: unknown[]) => void;
+
+const noop: LogFn = () => undefined;
+
+function installHookTestGlobals(overrides: Record<string, unknown> = {}): void {
+  (global as any)._ = _;
+  (global as any).sails = {
+    config: {
+      appPath: process.cwd(),
+      appUrl: 'https://example.redbox.local',
+      http: {
+        rootContext: 'redbox'
+      },
+      brandingConfigurationDefaults: {},
+      reusableFormDefinitions: {},
+      ...overrides
+    },
+    log: {
+      trace: noop,
+      verbose: noop,
+      info: noop,
+      warn: noop,
+      error: noop,
+      debug: noop
+    },
+    services: {}
+    ,after: (_event: string, handler: () => void) => handler()
+  };
+}
+
+function clearHookTestGlobals(): void {
+  delete (global as any)._;
+  delete (global as any).sails;
+}
+
+module.exports = {
+  installHookTestGlobals,
+  clearHookTestGlobals
+};

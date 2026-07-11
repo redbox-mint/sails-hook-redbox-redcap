@@ -1,0 +1,8 @@
+{
+  "integration-status-outcome-redcap-none": "Not started",
+  "integration-status-outcome-redcap-in-progress": "REDCap operation in progress",
+  "integration-status-outcome-redcap-validated": "REDCap project validated",
+  "integration-status-outcome-redcap-provisioned": "REDCap project linked",
+  "integration-status-outcome-redcap-error": "REDCap operation failed",
+  "integration-status-outcome-redcap-error-help": "Check the REDCap integration audit history or contact an administrator."
+}

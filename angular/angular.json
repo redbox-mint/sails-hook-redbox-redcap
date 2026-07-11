@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json", "version": 1, "newProjectRoot": "projects",
+  "projects": { "redcap": {
+    "projectType": "application", "root": "projects/researchdatabox/redcap", "sourceRoot": "projects/researchdatabox/redcap/src", "prefix": "redcap",
+    "architect": {
+      "build": { "builder": "@angular-devkit/build-angular:application", "options": {
+        "outputPath": { "base": "../assets/angular/redcap" }, "index": "projects/researchdatabox/redcap/src/index.html",
+        "browser": "projects/researchdatabox/redcap/src/main.ts", "polyfills": ["zone.js"],
+        "tsConfig": "projects/researchdatabox/redcap/tsconfig.app.json", "inlineStyleLanguage": "scss",
+        "assets": [{ "glob": "**/*", "input": "projects/researchdatabox/redcap/src/assets", "output": "assets" }],
+        "styles": ["projects/researchdatabox/redcap/src/styles.scss"]
+      }, "configurations": { "production": { "outputHashing": "none", "budgets": [{ "type": "initial", "maximumWarning": "1mb", "maximumError": "2mb" }] } } },
+      "test": { "builder": "@angular-devkit/build-angular:karma", "options": { "polyfills": ["zone.js", "zone.js/testing"],
+        "tsConfig": "projects/researchdatabox/redcap/tsconfig.spec.json", "assets": [{ "glob": "**/*", "input": "projects/researchdatabox/redcap/src/assets", "output": "assets" }], "styles": ["projects/researchdatabox/redcap/src/styles.scss"] } }
+    }
+  } }
+}
