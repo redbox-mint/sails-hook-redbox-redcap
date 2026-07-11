@@ -30,6 +30,7 @@ jobs:
       - checkout
       - run: npm install --include=dev && npm --prefix angular install --include=dev
       - run: { name: Build package, command: "npm run prepack" }
+      - run: { name: Set beta version, command: "npm version 1.0.0-beta.${CIRCLE_BUILD_NUM} --no-git-tag-version" }
       - run: { name: Authenticate with npm, command: "npm config set //registry.npmjs.org/:_authToken \"$NPM_TOKEN\"" }
       - run: npm publish --access public --tag beta
 workflows:
