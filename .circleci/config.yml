@@ -1,4 +1,8 @@
 version: 2.1
+parameters:
+  run_publish_beta:
+    type: boolean
+    default: false
 jobs:
   verify:
     machine: { image: ubuntu-2204:current }
@@ -35,5 +39,13 @@ jobs:
       - run: npm publish --access public --tag beta
 workflows:
   build:
+    unless: << pipeline.parameters.run_publish_beta >>
     jobs:
       - verify
+  beta_publish:
+    when: << pipeline.parameters.run_publish_beta >>
+    jobs:
+      - verify
+      - publish_beta:
+          requires: [verify]
+          context: npm-publish
