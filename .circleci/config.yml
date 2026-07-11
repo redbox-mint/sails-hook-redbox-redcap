@@ -2,8 +2,21 @@ version: 2.1
 jobs:
   verify:
     machine: { image: ubuntu-2204:current }
+    working_directory: /home/circleci/repo/sails-hook-redbox-redcap
     steps:
       - checkout
+      - run:
+          #TODO: Fix angular
+          name: Checkout ReDBox Portal
+          command: |
+            git clone --depth 1 --branch master https://github.com/redbox-mint/redbox-portal.git ../redbox-portal
+            printf '%s\n' \
+              '**/.git' \
+              '**/node_modules' \
+              '**/dist' \
+              '**/.tmp' \
+              '**/coverage' \
+              > ../.dockerignore
       - run: { name: Node and dependencies, command: "nvm install && npm install --include=dev && npm --prefix angular install --include=dev" }
       - run: { name: Compile, command: "npm run compile" }
       - run: { name: Unit tests, command: "npm run test:unit" }
