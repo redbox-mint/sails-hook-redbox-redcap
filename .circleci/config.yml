@@ -37,7 +37,3 @@ workflows:
   build:
     jobs:
       - verify
-      - publish_beta:
-          requires: [verify]
-          filters: { branches: { only: feature/v5-refactor } }
-          context: npm-publish
