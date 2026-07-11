@@ -29,9 +29,6 @@ services:
       - "../../../redbox-portal/support/integration-testing:/opt/redbox-portal/support/integration-testing"
       - "../../../redbox-portal/tsconfig.json:/opt/redbox-portal/tsconfig.json"
       - "../../test/integration:/opt/redbox-portal/test/integration/redcap"
-      - "../../../redbox-portal/packages/redbox-core:/opt/redbox-portal/packages/redbox-core"
-      - "../../../redbox-portal/packages/redbox-dev-tools:/opt/redbox-portal/packages/redbox-dev-tools"
-      - "../../../redbox-portal/packages/sails-ng-common:/opt/redbox-portal/packages/sails-ng-common"
     depends_on: *rbportal-depends
     expose:
       - "1500"
